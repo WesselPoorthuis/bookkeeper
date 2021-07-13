@@ -16,8 +16,8 @@ class Category:
         flow_in = 0
         flow_out = 0
         for transaction in self.transactions:
-            if transaction.attributes['bedrag'].startswith('-'):
-                flow_out += float(transaction.attributes['bedrag'])
+            if transaction.attributes['bedrag'] < 0:
+                flow_out += transaction.attributes['bedrag']
             else:
-                flow_in += float(transaction.attributes['bedrag'])
+                flow_in += transaction.attributes['bedrag']
         return (flow_in,flow_out)

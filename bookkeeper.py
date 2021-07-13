@@ -36,6 +36,7 @@ def categorize_transaction(transaction):
     if transaction.category is None:
         if transaction.attributes['boekingsdatum'] > vakantie_2020_start and transaction.attributes['boekingsdatum'] < vakantie_2020_end:
             category['Vakanties'].transactions.append(transaction)
+            transaction.category = 'Vakanties'
     if transaction.category is None:
         category['Geen categorie'].transactions.append(transaction)
 
@@ -44,7 +45,7 @@ def categorize_transaction(transaction):
 
 category_list = ['Overschrijving eigen rekeningen', 'Bijdrage familie', 'DUO', 'Boodschappen', 'Kleding', 'Media', 'Reiskosten', 'Woning', 'Drugs', 'Cadeaus', 'Terugbetalingen', 'Loon', 'Belastingen', 'Horeca', 'Goede doelen','Vaste lasten', 'Online bestellingen', 'Zorg', 'Feesten', 'Hobbies', 'Vakanties', 'Geen categorie']
 
-FILE_NAME_IN = 'betaal.csv'
+FILE_NAME_IN = 'betaal_2.csv'
 current_dir = os.path.dirname(os.path.realpath(__file__))
 path_in = os.path.join(current_dir, FILE_NAME_IN)
 
@@ -75,9 +76,9 @@ with open(path_in) as infile:
             'postcode': row[5],
             'plaats': row[6],
             'valuta': row[7],
-            'saldo_voor': row[8],
+            'saldo_voor': float(row[8]),
             'valuta_bedrag': row[9],
-            'bedrag': row[10],
+            'bedrag': float(row[10]),
             'journaaldatum': datetime.strptime(row[11], '%d-%m-%Y'),
             'valutadatum': datetime.strptime(row[12], '%d-%m-%Y'),
             'code_intern': row[13],
@@ -100,6 +101,11 @@ for cat in category_list:
 
 balance_change = total_in + total_out
 saldo_end = saldo_start + balance_change
+#
+# for transactions in category['Vakanties'].transactions:
+#     print(transactions.attributes['naam_tegenrekening'])
+#     print(transactions.attributes['omschrijving'])
+#     print(transactions.attributes['bedrag'])
 
 # Print results
 print(f'Starting money: {round(saldo_start,2)}')
