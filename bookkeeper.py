@@ -1,6 +1,8 @@
 import os
 import sys
 import csv
+from datetime import datetime
+# from datetime import date
 
 from keyword_dicts import create_keywords_naam_tegenrekening_dict, create_keywords_omschrijving_dict
 from classes import Transaction, Category
@@ -17,6 +19,8 @@ def categorize_transaction(transaction):
     naam_tegenrekening = transaction.attributes['naam_tegenrekening']
     omschrijving = transaction.attributes['omschrijving']
     omschrijving_short = omschrijving.split(">")[0].strip()
+    vakantie_2020_start = datetime.strptime('2020-07-08', '%Y-%m-%d')
+    vakantie_2020_end = datetime.strptime('2020-08-01', '%Y-%m-%d')
 
     # Categorize based on keywords
     for cat in category_list:
@@ -28,13 +32,17 @@ def categorize_transaction(transaction):
             category[cat].transactions.append(transaction)
             transaction.category = cat
             break
+
+    if transaction.category is None:
+        if transaction.attributes['boekingsdatum'] > vakantie_2020_start and transaction.attributes['boekingsdatum'] < vakantie_2020_end:
+            category['Vakanties'].transactions.append(transaction)
     if transaction.category is None:
         category['Geen categorie'].transactions.append(transaction)
 
 
 '''Start of program'''
 
-category_list = ['Overschrijving eigen rekeningen', 'Bijdrage familie', 'DUO', 'Boodschappen', 'Kleding', 'Media', 'Reiskosten', 'Woning', 'Drugs', 'Cadeaus', 'Terugbetalingen', 'Loon', 'Belastingen', 'Horeca', 'Goede doelen','Vaste lasten', 'Online bestellingen', 'Geen categorie']
+category_list = ['Overschrijving eigen rekeningen', 'Bijdrage familie', 'DUO', 'Boodschappen', 'Kleding', 'Media', 'Reiskosten', 'Woning', 'Drugs', 'Cadeaus', 'Terugbetalingen', 'Loon', 'Belastingen', 'Horeca', 'Goede doelen','Vaste lasten', 'Online bestellingen', 'Zorg', 'Feesten', 'Hobbies', 'Vakanties', 'Geen categorie']
 
 FILE_NAME_IN = 'betaal.csv'
 current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -43,7 +51,7 @@ path_in = os.path.join(current_dir, FILE_NAME_IN)
 saldo_start = 282.04
 total_in = 0
 total_out = 0
-money_per_cat = {}
+money_per_category = {}
 category = {}
 
 # Create keywords
@@ -59,7 +67,7 @@ with open(path_in) as infile:
     # Create transaction object
     for row in reader:
         attributes = {
-            'boekingsdatum': row[0],
+            'boekingsdatum': datetime.strptime(row[0], '%d-%m-%Y'),
             'opdrachtgeversrekening': row[1],
             'tegenrekening': row[2],
             'naam_tegenrekening': row[3],
@@ -70,8 +78,8 @@ with open(path_in) as infile:
             'saldo_voor': row[8],
             'valuta_bedrag': row[9],
             'bedrag': row[10],
-            'journaaldatum': row[11],
-            'valutadatum': row[12],
+            'journaaldatum': datetime.strptime(row[11], '%d-%m-%Y'),
+            'valutadatum': datetime.strptime(row[12], '%d-%m-%Y'),
             'code_intern': row[13],
             'code_globaal': row[14],
             'volgnummer': row[15],
@@ -80,14 +88,13 @@ with open(path_in) as infile:
             'afschriftnummer': row[18]
         }
         transaction = Transaction(attributes)
-
         # Categorize transaction
         categorize_transaction(transaction)
 
 # Money counting per category
 for cat in category_list:
-    (inflow, outflow) = category[cat].calc_in_out()
-    money_per_cat[cat] = inflow + outflow
+    (inflow, outflow) = category[cat].calculate_flows()
+    money_per_category[cat] = inflow + outflow
     total_in += inflow
     total_out += outflow
 
@@ -102,4 +109,4 @@ print(f'Balance change is: {round(balance_change,2)}')
 print(f'Ending money: {round(saldo_end,2)}\n')
 print(f'Net money per category:')
 for cat in category_list:
-    print(f'{cat}: {round(money_per_cat[cat],2)}')
+    print(f'{cat}: {round(money_per_category[cat],2)}')

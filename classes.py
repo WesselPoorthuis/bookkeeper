@@ -12,7 +12,7 @@ class Category:
         self.transactions = []
         self.keywords = []
 
-    def calc_in_out(self):
+    def calculate_flows(self):
         flow_in = 0
         flow_out = 0
         for transaction in self.transactions:
