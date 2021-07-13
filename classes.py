@@ -7,7 +7,8 @@ class Transaction:
 
 class Category:
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.transactions = []
         self.keywords = []
 
@@ -16,7 +17,7 @@ class Category:
         flow_out = 0
         for transaction in self.transactions:
             if transaction.attributes['bedrag'].startswith('-'):
-                flow_out += map(float, transaction.attributes['bedrag'])
+                flow_out += float(transaction.attributes['bedrag'])
             else:
-                flow_in += map(float, transaction.attributes['bedrag'])
+                flow_in += float(transaction.attributes['bedrag'])
         return (flow_in,flow_out)
