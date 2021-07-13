@@ -17,13 +17,18 @@ def categorize_transaction(transaction):
 
     # Categorize based on keywords
     for cat in categories:
-        if any(x in naam_tegenrekening for x in keywords_naam_tegenrekening[cat]) or any(x in omschrijving_short for x in keywords_omschrijving[cat]):
+        if any(x in naam_tegenrekening for x in keywords_naam_tegenrekening[cat]):
             categories_dict[cat].append(transaction)
             transaction.category = cat
+            break
+        if any(x in omschrijving_short for x in keywords_omschrijving[cat]):
+            categories_dict[cat].append(transaction)
+            transaction.category = cat
+            break
     if transaction.category is None:
         categories_dict['Geen categorie'].append(transaction)
 
-categories = ['Overschrijving eigen rekeningen', 'DUO', 'Boodschappen', 'Kleding', 'Media', 'Reiskosten', 'Woning', 'Drugs', 'Cadeaus', 'Terugbetalingen', 'Loon', 'Bijdrage familie', 'Belastingen', 'Horeca', 'Goede doelen','Vaste lasten', 'Online bestellingen', 'Geen categorie']
+categories = ['Overschrijving eigen rekeningen', 'Bijdrage familie', 'DUO', 'Boodschappen', 'Kleding', 'Media', 'Reiskosten', 'Woning', 'Drugs', 'Cadeaus', 'Terugbetalingen', 'Loon', 'Belastingen', 'Horeca', 'Goede doelen','Vaste lasten', 'Online bestellingen', 'Geen categorie']
 
 column_names = ['Boekingsdatum', 'Opdrachtgeversrekening', 'Tegenrekeningnummer', 'Naam tegenrekening', 'Adres', 'Postcode', 'Plaats', 'Valutasoort rekening', 'Saldo rekening voor mutatie', 'Valutasoort bedrag', 'Transactiebedrag', 'Journaaldatum', 'Valutadatum', 'Interne transactiecode', 'Globale transactiecode', 'Volgnummer transactie', 'Betalingskenmerk', 'Omschrijving', 'Afschriftnummer']
 
@@ -47,7 +52,6 @@ with open(path_in) as infile:
 
     # Create transaction object
     for row in reader:
-        # Assign attributes to transaction object
         attributes = {
             'boekingsdatum': row[0],
             'opdrachtgeversrekening': row[1],
@@ -80,12 +84,12 @@ with open(path_in) as infile:
         else:
             flow_in.append(transaction.attributes['bedrag'])
 
-# Money counting
+# Money counting per category
 for cat in categories:
     money = 0
+    #loop over all transactions in category
     for transaction in categories_dict[cat]:
         money += float(transaction.attributes['bedrag'])
-    money_per_cat[cat] = money
 
 total_in = sum(map(float, flow_in))
 total_out = sum(map(float, flow_out))

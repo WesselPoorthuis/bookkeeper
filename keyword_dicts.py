@@ -39,7 +39,7 @@ def create_keywords_omschrijving_dict():
     keywords_omschrijving['Boodschappen'] = ['Jumbo', 'ALBERT HEIJN', 'AH', 'Albert Heijn', 'Lidl', 'Ekoplaza', 'PLUS', 'Natuurwinkel', 'ALBERTHEIJN', 'ALDI', 'Aldi', 'Coop', 'Netto', 'DIRK', 'SweetGreen', 'Spar', 'Boon\'s', 'Odin', 'McD', 'MCD']
     keywords_omschrijving['Kleding'] = ['Vintage Island', 'De ARM', 'dump', 'DUMP', 'Episode']
     keywords_omschrijving['Media'] = ['AKO', 'Broese', 'ROBBEDOES', 'BOEKHANDEL']
-    keywords_omschrijving['Reiskosten'] = ['NS', 'Fietsen', 'Fiets', 'BIKE', 'Bike', 'Centraal', 'Giant']
+    keywords_omschrijving['Reiskosten'] = [ 'Fietsen', 'Fiets', 'BIKE', 'Bike', 'Centraal', 'Giant']
     keywords_omschrijving['Woning'] = ['Huisgeld']
     keywords_omschrijving['Drugs'] = ['Pleasure', 'PLEASURE', 'CULTURE', 'ANDERSOM', 'State of Mind']
     keywords_omschrijving['Cadeaus'] = []
