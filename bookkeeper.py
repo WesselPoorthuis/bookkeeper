@@ -3,28 +3,38 @@ import sys
 import csv
 import collections
 
+from keyword_dicts import create_keywords_naam_tegenrekening_dict, create_keywords_omschrijving_dict
+from classes import Transaction
+
 # Required for relative imports to also work when called
 # from project root directory.
 sys.path.append(os.path.dirname(__file__))
 
+def categorize_transaction(transaction):
+    naam_tegenrekening = transaction.attributes['naam_tegenrekening']
+    omschrijving = transaction.attributes['omschrijving']
+    omschrijving_short = omschrijving.split(">")[0].strip()
 
-class Transaction:
+    # Make transactions easily searchable
+    if naam_tegenrekening != '':
+        tegenrekeningen_dict[naam_tegenrekening].append(transaction)
+    else:
+        omschrijvingen_dict[omschrijving_short].append(transaction)
 
-    def __init__(self, attributes):
-        self.attributes = attributes
+    # Categorize based on keywords
+    for cat in categories:
+        if any(x in naam_tegenrekening for x in keywords_naam_tegenrekening[cat]):
+            categories_dict[cat].append(transaction)
+            tegenrekeningen_dict.pop(naam_tegenrekening, None)
+            transaction.category = cat
+        elif any(x in omschrijving_short for x in keywords_omschrijving[cat]):
+            categories_dict[cat].append(transaction)
+            omschrijvingen_dict.pop(omschrijving_short, None)
+            transaction.category = cat
 
+    return (tegenrekeningen_dict, omschrijvingen_dict)
 
-
-
-
-
-
-
-
-categories = ['Voeding', 'Reiskosten', 'Woning', 'Drank', 'Wiet', 'Cadeaus', 'Tikkies', 'Loon', 'Bijdrage papa en mama', 'Belastingen']
-
-
-
+categories = ['Overschrijving eigen rekeningen', 'DUO', 'Boodschappen', 'Kleding', 'Media', 'Reiskosten', 'Woning', 'Drugs', 'Cadeaus', 'Terugbetalingen', 'Loon', 'Bijdrage familie', 'Belastingen', 'Horeca', 'Goede doelen','Vaste lasten', 'Online bestellingen']
 
 column_names = ['Boekingsdatum', 'Opdrachtgeversrekening', 'Tegenrekeningnummer', 'Naam tegenrekening', 'Adres', 'Postcode', 'Plaats', 'Valutasoort rekening', 'Saldo rekening voor mutatie', 'Valutasoort bedrag', 'Transactiebedrag', 'Journaaldatum', 'Valutadatum', 'Interne transactiecode', 'Globale transactiecode', 'Volgnummer transactie', 'Betalingskenmerk', 'Omschrijving', 'Afschriftnummer']
 
@@ -35,11 +45,22 @@ path_in = os.path.join(current_dir, FILE_NAME_IN)
 saldo_start = 282.04
 flow_in = []
 flow_out = []
+tegenrekeningen_dict = collections.defaultdict(list)
+omschrijvingen_dict = collections.defaultdict(list)
+categories_dict = collections.defaultdict(list)
+keywords_naam_tegenrekening = {}
+keywords_omschrijving = {}
 
 with open(path_in) as infile:
-    reader = csv.reader(infile, delimiter = ';')
 
+    # Create keywords
+    keywords_naam_tegenrekening = create_keywords_naam_tegenrekening_dict()
+    keywords_omschrijving = create_keywords_omschrijving_dict()
+
+    # Read in .csv file
+    reader = csv.reader(infile, delimiter = ';')
     for row in reader:
+        # Assign attributes to transaction object
         attributes = {
             'boekingsdatum': row[0],
             'opdrachtgeversrekening': row[1],
@@ -61,14 +82,16 @@ with open(path_in) as infile:
             'omschrijving': row[17],
             'afschriftnummer': row[18]
         }
-
         transaction = Transaction(attributes)
+
+        # Categorisation
+        (tegenrekeningen_dict, omschrijvingen_dict) = categorize_transaction(transaction)
 
         # Total in/out
         if transaction.attributes['bedrag'].startswith('-'):
-            flow_out.append(row[10])
+            flow_out.append(transaction.attributes['bedrag'])
         else:
-            flow_in.append(row[10])
+            flow_in.append(transaction.attributes['bedrag'])
 
 total_in = sum(map(float, flow_in))
 total_out = sum(map(float, flow_out))
