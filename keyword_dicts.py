@@ -20,13 +20,14 @@ def create_keywords_naam_tegenrekening_dict():
     keywords_naam_tegenrekening['Drugs'] = []
     keywords_naam_tegenrekening['Cadeaus'] = ['foodelicious']
     keywords_naam_tegenrekening['Terugbetalingen'] = ['betaalverzoek', 'tikkie', 'abn amro bank nv', 'odekerken']
-    keywords_naam_tegenrekening['Loon'] = ['orloff aan de kade', 'driessen']
+    keywords_naam_tegenrekening['Loon'] = ['driessen']
     keywords_naam_tegenrekening['Bijdrage familie'] = ['k mol', 'f.p.m. poorthuis', 'rooseboom']
     keywords_naam_tegenrekening['Belastingen'] = ['belastingdienst']
     keywords_naam_tegenrekening['Horeca'] = ['louis hartlooper', 'ticketing', 'takeaway', 'thuisbezorgd', 'ticketswap']
     keywords_naam_tegenrekening['Goede doelen'] = ['milieudefensie', 'wwf', 'hersenstichting']
     keywords_naam_tegenrekening['Vaste lasten'] = ['youfone', 'orca', 'paypal']
     keywords_naam_tegenrekening['Online bestellingen'] = ['bol', 'coolblue', 'allekabels', 'alloverpiercings']
+    keywords_naam_tegenrekening['Geen categorie'] = []
 
     return keywords_naam_tegenrekening
 
@@ -43,13 +44,14 @@ def create_keywords_omschrijving_dict():
     keywords_omschrijving['Drugs'] = ['Pleasure', 'PLEASURE', 'CULTURE', 'ANDERSOM', 'State of Mind']
     keywords_omschrijving['Cadeaus'] = []
     keywords_omschrijving['Terugbetalingen'] = []
-    keywords_omschrijving['Loon'] = []
+    keywords_omschrijving['Loon'] = ['SALARIS']
     keywords_omschrijving['Bijdrage familie'] = []
     keywords_omschrijving['Belastingen'] = ['RENTE']
     keywords_omschrijving['Horeca'] = ['Ledig Erf', 'Orca', 'Ekko', 'EKKO', 'GROTE ZAAL', 'Falafel City', 'Filmcafe', 'Orloff', 'Cafe', 'cafe', 'CAFE', 'LANTAREN', 'TIVOLI', 'Vegan', 'Dikke Dries', 'Smullers', 'Lunchroom', 'Manneken Pis', 'Eethuis', 'Ladage', 'eten', 'DONER', 'Una Mas', 'Poema', 'SLA', 'LaPlace', 'Pandje']
     keywords_omschrijving['Goede doelen'] = []
     keywords_omschrijving['Vaste lasten'] = []
     keywords_omschrijving['Online bestellingen'] = []
+    keywords_omschrijving['Geen categorie'] = []
 
 
     return keywords_omschrijving

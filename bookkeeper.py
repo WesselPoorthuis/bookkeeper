@@ -15,26 +15,15 @@ def categorize_transaction(transaction):
     omschrijving = transaction.attributes['omschrijving']
     omschrijving_short = omschrijving.split(">")[0].strip()
 
-    # Make transactions easily searchable
-    if naam_tegenrekening != '':
-        tegenrekeningen_dict[naam_tegenrekening].append(transaction)
-    else:
-        omschrijvingen_dict[omschrijving_short].append(transaction)
-
     # Categorize based on keywords
     for cat in categories:
-        if any(x in naam_tegenrekening for x in keywords_naam_tegenrekening[cat]):
+        if any(x in naam_tegenrekening for x in keywords_naam_tegenrekening[cat]) or any(x in omschrijving_short for x in keywords_omschrijving[cat]):
             categories_dict[cat].append(transaction)
-            tegenrekeningen_dict.pop(naam_tegenrekening, None)
             transaction.category = cat
-        elif any(x in omschrijving_short for x in keywords_omschrijving[cat]):
-            categories_dict[cat].append(transaction)
-            omschrijvingen_dict.pop(omschrijving_short, None)
-            transaction.category = cat
+    if transaction.category is None:
+        categories_dict['Geen categorie'].append(transaction)
 
-    return (tegenrekeningen_dict, omschrijvingen_dict)
-
-categories = ['Overschrijving eigen rekeningen', 'DUO', 'Boodschappen', 'Kleding', 'Media', 'Reiskosten', 'Woning', 'Drugs', 'Cadeaus', 'Terugbetalingen', 'Loon', 'Bijdrage familie', 'Belastingen', 'Horeca', 'Goede doelen','Vaste lasten', 'Online bestellingen']
+categories = ['Overschrijving eigen rekeningen', 'DUO', 'Boodschappen', 'Kleding', 'Media', 'Reiskosten', 'Woning', 'Drugs', 'Cadeaus', 'Terugbetalingen', 'Loon', 'Bijdrage familie', 'Belastingen', 'Horeca', 'Goede doelen','Vaste lasten', 'Online bestellingen', 'Geen categorie']
 
 column_names = ['Boekingsdatum', 'Opdrachtgeversrekening', 'Tegenrekeningnummer', 'Naam tegenrekening', 'Adres', 'Postcode', 'Plaats', 'Valutasoort rekening', 'Saldo rekening voor mutatie', 'Valutasoort bedrag', 'Transactiebedrag', 'Journaaldatum', 'Valutadatum', 'Interne transactiecode', 'Globale transactiecode', 'Volgnummer transactie', 'Betalingskenmerk', 'Omschrijving', 'Afschriftnummer']
 
@@ -45,20 +34,18 @@ path_in = os.path.join(current_dir, FILE_NAME_IN)
 saldo_start = 282.04
 flow_in = []
 flow_out = []
-tegenrekeningen_dict = collections.defaultdict(list)
-omschrijvingen_dict = collections.defaultdict(list)
 categories_dict = collections.defaultdict(list)
-keywords_naam_tegenrekening = {}
-keywords_omschrijving = {}
+money_per_cat = {}
 
+# Create keywords
+keywords_naam_tegenrekening = create_keywords_naam_tegenrekening_dict()
+keywords_omschrijving = create_keywords_omschrijving_dict()
+
+# Read in .csv file
 with open(path_in) as infile:
-
-    # Create keywords
-    keywords_naam_tegenrekening = create_keywords_naam_tegenrekening_dict()
-    keywords_omschrijving = create_keywords_omschrijving_dict()
-
-    # Read in .csv file
     reader = csv.reader(infile, delimiter = ';')
+
+    # Create transaction object
     for row in reader:
         # Assign attributes to transaction object
         attributes = {
@@ -84,22 +71,33 @@ with open(path_in) as infile:
         }
         transaction = Transaction(attributes)
 
-        # Categorisation
-        (tegenrekeningen_dict, omschrijvingen_dict) = categorize_transaction(transaction)
+        # Categorize transaction
+        categorize_transaction(transaction)
 
-        # Total in/out
+        # In/out
         if transaction.attributes['bedrag'].startswith('-'):
             flow_out.append(transaction.attributes['bedrag'])
         else:
             flow_in.append(transaction.attributes['bedrag'])
+
+# Money counting
+for cat in categories:
+    money = 0
+    for transaction in categories_dict[cat]:
+        money += float(transaction.attributes['bedrag'])
+    money_per_cat[cat] = money
 
 total_in = sum(map(float, flow_in))
 total_out = sum(map(float, flow_out))
 balance_change = total_in + total_out
 saldo_end = saldo_start + balance_change
 
+# Print results
 print(f'Starting money: {round(saldo_start,2)}')
 print(f'Total money in: {round(total_in,2)}')
 print(f'Total money out: {round(total_out,2)}')
 print(f'Balance change is: {round(balance_change,2)}')
-print(f'Ending money: {round(saldo_end,2)}')
+print(f'Ending money: {round(saldo_end,2)}\n')
+print(f'Net money per category:')
+for cat in categories:
+    print(f'{cat}: {round(money_per_cat[cat],2)}')
