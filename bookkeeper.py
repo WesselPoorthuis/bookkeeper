@@ -40,6 +40,17 @@ def categorize_transaction(transaction):
     if transaction.category is None:
         category['Geen categorie'].transactions.append(transaction)
 
+def print_details(requested_category):
+        (inflow, outflow) = category[requested_category].calculate_flows()
+        print(f'\nMoney gained in category {requested_category}: {round(inflow,2)}')
+        print(f'Money lost in category {requested_category}: {round(outflow,2)}')
+        if '--transactions' in sys.argv:
+            for transaction in category[requested_category].transactions:
+                print(datetime.strftime(transaction.attributes['boekingsdatum'], '%d-%m-%Y'))
+                print(transaction.attributes['valuta_bedrag'] + ' ' + str(round(transaction.attributes['bedrag'],2)))
+                print(transaction.attributes['naam_tegenrekening'] )
+                print(transaction.attributes['omschrijving'])
+                print('\n')
 
 '''Start of program'''
 
@@ -101,7 +112,7 @@ for cat in category_list:
 
 balance_change = total_in + total_out
 saldo_end = saldo_start + balance_change
-#
+
 # for transactions in category['Vakanties'].transactions:
 #     print(transactions.attributes['naam_tegenrekening'])
 #     print(transactions.attributes['omschrijving'])
@@ -116,3 +127,11 @@ print(f'Ending money: {round(saldo_end,2)}\n')
 print(f'Net money per category:')
 for cat in category_list:
     print(f'{cat}: {round(money_per_category[cat],2)}')
+
+if '--category' in sys.argv:
+    print("Available categories are listed above.")
+    requested_category = input('Which category would like details on?\n\n')
+    try:
+        print_details(requested_category)
+    except KeyError:
+        print('\nSorry, the input did not match any category.')
