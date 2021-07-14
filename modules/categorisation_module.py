@@ -1,12 +1,7 @@
 from datetime import datetime
-from modules.keywords_module import create_keywords_naam_tegenrekening_dict, create_keywords_omschrijving_dict
 from classes import Transaction, Category
 
 def categorize_transaction(transaction, category):
-
-    # Create keywords
-    keywords_naam_tegenrekening = create_keywords_naam_tegenrekening_dict()
-    keywords_omschrijving = create_keywords_omschrijving_dict()
 
     naam_tegenrekening = transaction.attributes['naam_tegenrekening']
     omschrijving = transaction.attributes['omschrijving']
@@ -19,11 +14,11 @@ def categorize_transaction(transaction, category):
 
     # Categorisation based on keywords
     for cat in category:
-        if any(x in naam_tegenrekening for x in keywords_naam_tegenrekening[cat]):
+        if any(x in naam_tegenrekening for x in category[cat].keywords_naam_tegenrekening):
             category[cat].transactions.append(transaction)
             transaction.category = cat
             break
-        if any(x in omschrijving_short for x in keywords_omschrijving[cat]):
+        if any(x in omschrijving_short for x in category[cat].keywords_omschrijving):
             category[cat].transactions.append(transaction)
             transaction.category = cat
             break

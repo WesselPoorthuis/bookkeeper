@@ -2,7 +2,7 @@ import sys
 import csv
 from datetime import datetime
 
-def print_category_details(requested_category, category):
+def print_category_details(requested_category, category, saldo_start):
         (inflow, outflow) = category[requested_category].calculate_flows()
         print(f'\nMoney gained in category: {requested_category}: {round(inflow,2)}')
         print(f'Money lost in category: {requested_category}: {round(outflow,2)}')
@@ -16,18 +16,27 @@ def print_category_details(requested_category, category):
                 print('\n')
 
         if '--timeline' in sys.argv:
-            make_timeline_csv(requested_category, category)
+            make_timeline_csv(requested_category, category, saldo_start)
 
-def make_timeline_csv(requested_category, category):
+def make_timeline_csv(requested_category, category, saldo_start):
     net_change = 0
     if requested_category == 'Totaal':
         net_change += saldo_start
     with open(f'outputs/{requested_category}_timeline.csv', 'w', newline='') as csvfile:
         transaction_writer = csv.writer(csvfile, delimiter =',', quotechar = '"')
-        for transaction in category[requested_category].transactions:
 
-            net_change += transaction.attributes['bedrag']
-            transaction_writer.writerow([datetime.strftime(transaction.attributes['boekingsdatum'], '%d-%m-%Y'),str(net_change)])
+        # Write header
+        transaction_writer.writerow(['boekingsdatum', 'bedrag', 'saldo_voor', 'category'])
+
+        for transaction in category[requested_category].transactions:
+            net_change += 1
+            columns = [
+            datetime.strftime(transaction.attributes['boekingsdatum'],'%d-%m-%Y'),
+            str(transaction.attributes['bedrag']),
+            str(transaction.attributes['saldo_voor']),
+            transaction.category
+            ]
+            transaction_writer.writerow(columns)
     print(f'\n{requested_category}_timeline.csv had been created in the outputs folder.')
 
 
@@ -61,9 +70,11 @@ def print_results(category_list, category, saldo_start):
         print(f'{cat:20}: {money_per_category[cat]:10.2f}')
 
     if '--category' in sys.argv:
-        print("\nAvailable categories are listed above.")
-        requested_category = input('Which category would like details on?\n\n')
-        try:
-            print_category_details(requested_category, category)
-        except KeyError:
-            print('\nSorry, the input did not match any category.')
+        while True:
+            try:
+                print("\nAvailable categories are listed above.")
+                requested_category = input('Which category would like details on?\n')
+                print_category_details(requested_category, category, saldo_start)
+                break
+            except:
+                print('\nSorry, the input did not match any category. Try again.')

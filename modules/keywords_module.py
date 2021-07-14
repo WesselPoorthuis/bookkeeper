@@ -1,61 +1,53 @@
 
-def create_keywords_naam_tegenrekening_dict():
-    keywords_naam_tegenrekening = {}
-
+def add_tegenrekening_keywords(category):
     names = ['odekerken', 'keizer', 'mineur', 'h g poorthuis', 'j berends', 'mw kz lieverse', 'fj sloos']
 
-    keywords_naam_tegenrekening['Totaal'] = []
-    keywords_naam_tegenrekening['Eigen rekeningen'] = ['wa poorthuis', 'w.a. poorthuis', 'w a poorthuis', 'poorthuis w a', 'Ideaalsparen', 'ideaalsparen']
-    keywords_naam_tegenrekening['DUO'] = ['DUO', 'duo']
-    keywords_naam_tegenrekening['Boodschappen'] = ['albert heijn', 'jumbo', 'AH', 'McD', 'MCD']
-    keywords_naam_tegenrekening['Kleding'] = ['veganwear']
-    keywords_naam_tegenrekening['Media'] = ['steampowered', 'boekenroute', 'games']
-    keywords_naam_tegenrekening['Reiskosten'] = ['ns groep', 'chipkaart', 'NS Utrecht', 'NS Reizigers', 'NS Rotterdam']
-    keywords_naam_tegenrekening['Woning'] = ['donker', 'ssh']
-    keywords_naam_tegenrekening['Drugs'] = []
-    keywords_naam_tegenrekening['Cadeaus'] = ['foodelicious']
-    keywords_naam_tegenrekening['Terugbetalingen'] = ['betaalverzoek', 'tikkie', 'abn amro bank nv'] + names
-    keywords_naam_tegenrekening['Loon'] = ['driessen']
-    keywords_naam_tegenrekening['Bijdrage familie'] = ['k mol', 'f.p.m. poorthuis', 'rooseboom']
-    keywords_naam_tegenrekening['Belastingen'] = ['belastingdienst']
-    keywords_naam_tegenrekening['Horeca'] = ['louis hartlooper', 'takeaway', 'thuisbezorgd']
-    keywords_naam_tegenrekening['Feesten'] = {'ticketing',  'ticketswap'}
-    keywords_naam_tegenrekening['Goede doelen'] = ['milieudefensie', 'wwf', 'hersenstichting']
-    keywords_naam_tegenrekening['Vaste lasten'] = ['youfone', 'orca', 'paypal', 'Gemeente']
-    keywords_naam_tegenrekening['Online bestellingen'] = ['bol', 'coolblue', 'allekabels', 'alloverpiercings', 'amazon', 'marktplaats']
-    keywords_naam_tegenrekening['Zorg'] = ['unive', 'infomedics', 'fysiotherapie']
-    keywords_naam_tegenrekening['Hobbies'] = []
-    keywords_naam_tegenrekening['Vakanties'] = ['SUPERSTORE']
-    keywords_naam_tegenrekening['Geen categorie'] = []
+    category['Totaal'].keywords_naam_tegenrekening = []
+    category['Eigen rekeningen'].keywords_naam_tegenrekening = ['wa poorthuis', 'w.a. poorthuis', 'w a poorthuis', 'poorthuis w a', 'Ideaalsparen', 'ideaalsparen']
+    category['DUO'].keywords_naam_tegenrekening = ['DUO', 'duo']
+    category['Boodschappen'].keywords_naam_tegenrekening = ['albert heijn', 'jumbo', 'AH', 'McD', 'MCD']
+    category['Kleding'].keywords_naam_tegenrekening = ['veganwear']
+    category['Media'].keywords_naam_tegenrekening = ['steampowered', 'boekenroute', 'games']
+    category['Reiskosten'].keywords_naam_tegenrekening = ['ns groep', 'chipkaart', 'NS Utrecht', 'NS Reizigers', 'NS Rotterdam']
+    category['Woning'].keywords_naam_tegenrekening = ['donker', 'ssh']
+    category['Drugs'].keywords_naam_tegenrekening = []
+    category['Cadeaus'] .keywords_naam_tegenrekening= ['foodelicious']
+    category['Terugbetalingen'].keywords_naam_tegenrekening = ['betaalverzoek', 'tikkie', 'abn amro bank nv'] + names
+    category['Loon'].keywords_naam_tegenrekening = ['driessen']
+    category['Bijdrage familie'].keywords_naam_tegenrekening = ['k mol', 'f.p.m. poorthuis', 'rooseboom']
+    category['Belastingen'] .keywords_naam_tegenrekening= ['belastingdienst']
+    category['Horeca'].keywords_naam_tegenrekening = ['louis hartlooper', 'takeaway', 'thuisbezorgd']
+    category['Feesten'].keywords_naam_tegenrekening = {'ticketing',  'ticketswap'}
+    category['Goede doelen'].keywords_naam_tegenrekening = ['milieudefensie', 'wwf', 'hersenstichting']
+    category['Vaste lasten'] .keywords_naam_tegenrekening= ['youfone', 'orca', 'paypal', 'Gemeente']
+    category['Online bestellingen'].keywords_naam_tegenrekening = ['bol', 'coolblue', 'allekabels', 'alloverpiercings', 'amazon', 'marktplaats']
+    category['Zorg'].keywords_naam_tegenrekening = ['unive', 'infomedics', 'fysiotherapie']
+    category['Hobbies'].keywords_naam_tegenrekening = []
+    category['Vakanties'].keywords_naam_tegenrekening= ['SUPERSTORE']
+    category['Geen categorie'].keywords_naam_tegenrekening = []
 
-    return keywords_naam_tegenrekening
+def add_omschrijving_keywords(category):
 
-def create_keywords_omschrijving_dict():
-    keywords_omschrijving = {}
-
-    keywords_omschrijving['Totaal'] = []
-    keywords_omschrijving['Eigen rekeningen'] = ['Eerste inleg']
-    keywords_omschrijving['DUO'] = []
-    keywords_omschrijving['Boodschappen'] = ['Jumbo', 'ALBERT HEIJN', 'AH', 'Albert Heijn', 'Lidl', 'Ekoplaza', 'PLUS', 'Natuurwinkel', 'ALBERTHEIJN', 'ALDI', 'Aldi', 'Coop', 'Netto', 'DIRK', 'SweetGreen', 'Spar', 'Boon\'s', 'Odin', 'McD', 'MCD', 'BOONS']
-    keywords_omschrijving['Kleding'] = ['Vintage Island', 'De ARM', 'dump', 'DUMP', 'Episode', 'Book Center']
-    keywords_omschrijving['Media'] = ['AKO', 'Broese', 'ROBBEDOES', 'BOEKHANDEL', 'LantarenVenster']
-    keywords_omschrijving['Reiskosten'] = [ 'Fietsen', 'Fiets', 'BIKE', 'Bike', 'Centraal', 'Giant', 'NS-', 'NS Utrecht', 'NS Reizigers', 'NS Rotterdam']
-    keywords_omschrijving['Woning'] = ['Huisgeld', 'Airbnb']
-    keywords_omschrijving['Drugs'] = ['Pleasure', 'PLEASURE', 'CULTURE', 'ANDERSOM', 'State of Mind']
-    keywords_omschrijving['Cadeaus'] = ['CASA', 'Kinderwin.Westerkade']
-    keywords_omschrijving['Terugbetalingen'] = ['OVERBOEKING VIA INTERNET']
-    keywords_omschrijving['Loon'] = ['SALARIS']
-    keywords_omschrijving['Bijdrage familie'] = []
-    keywords_omschrijving['Belastingen'] = ['RENTE']
-    keywords_omschrijving['Horeca'] = ['Ledig Erf', 'Orca', 'Ekko', 'EKKO', 'GROTE ZAAL', 'Falafel City', 'Filmcafe', 'Orloff', 'Cafe', 'cafe', 'CAFE', 'Vegan', 'Dikke Dries', 'Smullers', 'Lunchroom', 'Manneken Pis', 'Eethuis', 'Ladage', 'eten', 'DONER', 'Una Mas', 'Poema', 'SLA', 'LaPlace', 'Pandje', 'Snackbar', 'Food Village', 'Barlow']
-    keywords_omschrijving['Feesten'] = {'Festival', 'TIVOLI', 'TivoliVredenburg'}
-    keywords_omschrijving['Goede doelen'] = []
-    keywords_omschrijving['Vaste lasten'] = []
-    keywords_omschrijving['Online bestellingen'] = []
-    keywords_omschrijving['Zorg'] = ['fysiotherapie']
-    keywords_omschrijving['Hobbies'] = ['Pipoos', 'Kathmandu']
-    keywords_omschrijving['Vakanties'] = []
-    keywords_omschrijving['Geen categorie'] = []
-
-
-    return keywords_omschrijving
+    category['Totaal'].keywords_omschrijving = []
+    category['Eigen rekeningen'].keywords_omschrijving = ['Eerste inleg']
+    category['DUO'].keywords_omschrijving = []
+    category['Boodschappen'].keywords_omschrijving = ['Jumbo', 'ALBERT HEIJN', 'AH', 'Albert Heijn', 'Lidl', 'Ekoplaza', 'PLUS', 'Natuurwinkel', 'ALBERTHEIJN', 'ALDI', 'Aldi', 'Coop', 'Netto', 'DIRK', 'SweetGreen', 'Spar', 'Boon\'s', 'Odin', 'McD', 'MCD', 'BOONS']
+    category['Kleding'].keywords_omschrijving = ['Vintage Island', 'De ARM', 'dump', 'DUMP', 'Episode', 'Book Center']
+    category['Media'].keywords_omschrijving = ['AKO', 'Broese', 'ROBBEDOES', 'BOEKHANDEL', 'LantarenVenster']
+    category['Reiskosten'].keywords_omschrijving = [ 'Fietsen', 'Fiets', 'BIKE', 'Bike', 'Centraal', 'Giant', 'NS-', 'NS Utrecht', 'NS Reizigers', 'NS Rotterdam']
+    category['Woning'].keywords_omschrijving = ['Huisgeld', 'Airbnb']
+    category['Drugs'].keywords_omschrijving = ['Pleasure', 'PLEASURE', 'CULTURE', 'ANDERSOM', 'State of Mind']
+    category['Cadeaus'].keywords_omschrijving = ['CASA', 'Kinderwin.Westerkade']
+    category['Terugbetalingen'].keywords_omschrijving = ['OVERBOEKING VIA INTERNET']
+    category['Loon'].keywords_omschrijving = ['SALARIS']
+    category['Bijdrage familie'].keywords_omschrijving = []
+    category['Belastingen'].keywords_omschrijving = ['RENTE']
+    category['Horeca'].keywords_omschrijving = ['Ledig Erf', 'Orca', 'Ekko', 'EKKO', 'GROTE ZAAL', 'Falafel City', 'Filmcafe', 'Orloff', 'Cafe', 'cafe', 'CAFE', 'Vegan', 'Dikke Dries', 'Smullers', 'Lunchroom', 'Manneken Pis', 'Eethuis', 'Ladage', 'eten', 'DONER', 'Una Mas', 'Poema', 'SLA', 'LaPlace', 'Pandje', 'Snackbar', 'Food Village', 'Barlow']
+    category['Feesten'].keywords_omschrijving = ['Festival', 'TIVOLI', 'TivoliVredenburg']
+    category['Goede doelen'].keywords_omschrijving = []
+    category['Vaste lasten'].keywords_omschrijving = []
+    category['Online bestellingen'].keywords_omschrijving = []
+    category['Zorg'].keywords_omschrijving = ['fysiotherapie']
+    category['Hobbies'].keywords_omschrijving = ['Pipoos', 'Kathmandu']
+    category['Vakanties'].keywords_omschrijving = []
+    category['Geen categorie'].keywords_omschrijving = []
