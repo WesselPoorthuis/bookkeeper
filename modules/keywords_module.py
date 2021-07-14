@@ -1,18 +1,11 @@
-import os
-import sys
-import csv
-import collections
-
-# Required for relative imports to also work when called
-# from project root directory.
-sys.path.append(os.path.dirname(__file__))
 
 def create_keywords_naam_tegenrekening_dict():
     keywords_naam_tegenrekening = {}
 
     names = ['odekerken', 'keizer', 'mineur', 'h g poorthuis', 'j berends', 'mw kz lieverse', 'fj sloos']
 
-    keywords_naam_tegenrekening['Overschrijving eigen rekeningen'] = ['wa poorthuis', 'w.a. poorthuis', 'w a poorthuis', 'poorthuis w a', 'Ideaalsparen', 'ideaalsparen']
+    keywords_naam_tegenrekening['Totaal'] = []
+    keywords_naam_tegenrekening['Eigen rekeningen'] = ['wa poorthuis', 'w.a. poorthuis', 'w a poorthuis', 'poorthuis w a', 'Ideaalsparen', 'ideaalsparen']
     keywords_naam_tegenrekening['DUO'] = ['DUO', 'duo']
     keywords_naam_tegenrekening['Boodschappen'] = ['albert heijn', 'jumbo', 'AH', 'McD', 'MCD']
     keywords_naam_tegenrekening['Kleding'] = ['veganwear']
@@ -40,7 +33,8 @@ def create_keywords_naam_tegenrekening_dict():
 def create_keywords_omschrijving_dict():
     keywords_omschrijving = {}
 
-    keywords_omschrijving['Overschrijving eigen rekeningen'] = ['Eerste inleg']
+    keywords_omschrijving['Totaal'] = []
+    keywords_omschrijving['Eigen rekeningen'] = ['Eerste inleg']
     keywords_omschrijving['DUO'] = []
     keywords_omschrijving['Boodschappen'] = ['Jumbo', 'ALBERT HEIJN', 'AH', 'Albert Heijn', 'Lidl', 'Ekoplaza', 'PLUS', 'Natuurwinkel', 'ALBERTHEIJN', 'ALDI', 'Aldi', 'Coop', 'Netto', 'DIRK', 'SweetGreen', 'Spar', 'Boon\'s', 'Odin', 'McD', 'MCD', 'BOONS']
     keywords_omschrijving['Kleding'] = ['Vintage Island', 'De ARM', 'dump', 'DUMP', 'Episode', 'Book Center']

@@ -1,0 +1,4 @@
+- Make transactions searchable per time window (and per cat at the same time)
+- Visualizations
+- Get keywords in categories elegantly
+- Add warning when more than x% of transactions are not categorized
