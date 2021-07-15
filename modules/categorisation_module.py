@@ -30,3 +30,4 @@ def categorize_transaction(transaction, category):
             transaction.category = 'Vakanties'
     if transaction.category is None:
         category['Geen categorie'].transactions.append(transaction)
+        

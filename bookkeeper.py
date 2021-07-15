@@ -13,17 +13,17 @@ from classes import Transaction, Category
 # from project root directory.
 sys.path.append(os.path.dirname(__file__))
 
-def check_dates():
-    if '--date' in sys.argv:
+def check_date():
         while True:
             try:
                 requested_date = input('Enter desired date in dd-mm-yyyy format\n')
                 requested_date = datetime.strptime(requested_date, '%d-%m-%Y')
+                return requested_date
                 break
             except:
                 print(f'{requested_date} is not the right format, please try again\n')
 
-    if '--dates' in sys.argv:
+def check_dates():
         while True:
             try:
                 start_date = input('Enter starting date in dd-mm-yyyy format\n')
@@ -35,6 +35,7 @@ def check_dates():
             try:
                 end_date = input('Enter final date in dd-mm-yyyy format\n')
                 end_date = datetime.strptime(end_date, '%d-%m-%Y')
+                return (start_date, end_date)
                 break
             except:
                 print(f'{end_date} is not the right format, please try again\n')
@@ -48,13 +49,8 @@ def initialize_categories(category_list, category):
     add_tegenrekening_keywords(category)
     add_omschrijving_keywords(category)
 
-def get_starting_amount(transaction, transaction_number):
-    if transaction_number == 0:
-        saldo_start = transaction.attributes['saldo_voor']
-        return saldo_start
-
-def get_starting_amount(transaction, transaction_number, saldo_start):
-    if transaction_number == 1:
+def get_starting_amount(transaction, saldo_start):
+    if transaction.attributes['transaction_number'] == 0:
         saldo_start = transaction.attributes['saldo_voor']
     return saldo_start
 
@@ -62,8 +58,8 @@ def main():
     # Create help
     parser = argparse.ArgumentParser(description='Goes through .csv file with banking details and categorizes transactions.')
     parser.add_argument('--category', action='store_true', help='get more detailed information about a category')
-    parser.add_argument('--timeline', action='store_true', help='generate .csv file with transaction history of category')
-    parser.add_argument('--transactions', action='store_true', help='prints every transaction in the category')
+    parser.add_argument('--csv', action='store_true', help='generate .csv file with transaction history of the category specified with --category')
+    parser.add_argument('--transactions', action='store_true', help='prints every transaction in the category specified with --category')
     parser.add_argument('--date', action='store_true', help='only considers transactions on a given date')
     parser.add_argument('--dates', action='store_true', help='only considers transactions between two given dates')
     args = parser.parse_args()
@@ -100,8 +96,13 @@ def main():
     #Check for date modifiers
     requested_date = None
     start_date = None
-    end_date= None
-    check_dates()
+    end_date = None
+
+    if '--date' in sys.argv:
+        requested_date = check_date()
+
+    if '--dates' in sys.argv:
+        (start_date, end_date) = check_dates()
 
     # Declare variables
     transaction_number = 0
@@ -119,6 +120,7 @@ def main():
         for row in reader:
 
             attributes = {
+                'transaction_number' : transaction_number,
                 'boekingsdatum': datetime.strptime(row[0], '%d-%m-%Y'),
                 'opdrachtgeversrekening': row[1],
                 'tegenrekening': row[2],
@@ -140,28 +142,14 @@ def main():
                 'afschriftnummer': row[18]
             }
 
-            if requested_date is not None:
-                if attributes['boekingsdatum'] == requested_date:
-                    transaction = Transaction(attributes)
-                    transaction_number += 1
-                else:
-                    continue
-            if start_date is not None:
-                if attributes['boekingsdatum'] > start_date and attributes['boekingsdatum'] < end_date:
-                    transaction = Transaction(attributes)
-                    transaction_number += 1
-                else:
-                    continue
-            else:
+            if (requested_date is None and start_date is None) or (requested_date is not None and attributes['boekingsdatum'] == requested_date) or (start_date is not None and attributes['boekingsdatum'] > start_date and attributes['boekingsdatum'] < end_date):
                 transaction = Transaction(attributes)
+                saldo_start = get_starting_amount(transaction, saldo_start)
+                categorize_transaction(transaction, category)
                 transaction_number += 1
 
-            saldo_start = get_starting_amount(transaction, transaction_number, saldo_start)
-
-            categorize_transaction(transaction, category)
-
     #Print results
-    print_results(category_list, category, saldo_start)
+    print_results(category, saldo_start)
 
 if __name__ == "__main__":
 	main()
