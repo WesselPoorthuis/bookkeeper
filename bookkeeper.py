@@ -85,6 +85,7 @@ def main():
     'Hobbies',
     'Vakanties',
     'Spaar',
+    'Gepind',
     'Geen categorie']
 
     initialize_categories(category_list, category)

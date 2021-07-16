@@ -5,24 +5,37 @@ def categorize_transaction(transaction, category):
 
     naam_tegenrekening = transaction.attributes['naam_tegenrekening'].lower()
     omschrijving = transaction.attributes['omschrijving'].lower()
-    omschrijving_short = omschrijving.split(">")[0].strip()
-    vakantie_2020_start = datetime.strptime('2020-07-08', '%Y-%m-%d')
-    vakantie_2020_end = datetime.strptime('2020-08-01', '%Y-%m-%d')
+
+    #Holidays
+    zomervakantie_2020_start = datetime.strptime('2020-07-08', '%Y-%m-%d')
+    zomervakantie_2020_end = datetime.strptime('2020-08-01', '%Y-%m-%d')
+    chillberen_keulen_2019_start = datetime.strptime('2019-12-27', '%Y-%m-%d')
+    chillberen_keulen_2019_end = datetime.strptime('2019-12-30', '%Y-%m-%d')
 
     # Categorisation based on IBAN
     # These transactions are between current account and savings account
     if transaction.attributes['tegenrekening'] == 'NL63ASNB8820283166':
         category['Spaar'].transactions.append(transaction)
         transaction.category = 'Spaar'
-        transaction.attributes['bedrag'] = - transaction.attributes['bedrag']
+        transaction.attributes['bedrag'] = -transaction.attributes['bedrag']
 
     # Every non savings account transaction gets added to the Totaal category
     if transaction.category is None:
         category['Totaal'].transactions.append(transaction)
 
+    # Holiday dates
+    zomervakantie_2020_start = datetime.strptime('2020-07-08', '%Y-%m-%d')
+    zomervakantie_2020_end = datetime.strptime('2020-08-01', '%Y-%m-%d')
+    chillberen_keulen_2019_start = datetime.strptime('2019-12-27', '%Y-%m-%d')
+    chillberen_keulen_2019_end = datetime.strptime('2019-12-30', '%Y-%m-%d')
+
     # Categorisation based on date
     if transaction.category is None:
-        if transaction.attributes['boekingsdatum'] > vakantie_2020_start and transaction.attributes['boekingsdatum'] < vakantie_2020_end:
+        if transaction.attributes['boekingsdatum'] >= zomervakantie_2020_start and transaction.attributes['boekingsdatum'] <= zomervakantie_2020_end:
+            category['Vakanties'].transactions.append(transaction)
+            transaction.category = 'Vakanties'
+    if transaction.category is None:
+        if transaction.attributes['boekingsdatum'] >= chillberen_keulen_2019_start and transaction.attributes['boekingsdatum'] <= chillberen_keulen_2019_end:
             category['Vakanties'].transactions.append(transaction)
             transaction.category = 'Vakanties'
 
@@ -33,7 +46,7 @@ def categorize_transaction(transaction, category):
                 category[cat].transactions.append(transaction)
                 transaction.category = cat
                 break
-            if any(x.lower() in omschrijving_short for x in category[cat].keywords_omschrijving):
+            if any(x.lower() in omschrijving for x in category[cat].keywords_omschrijving):
                 category[cat].transactions.append(transaction)
                 transaction.category = cat
                 break
