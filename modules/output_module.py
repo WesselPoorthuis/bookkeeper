@@ -4,8 +4,8 @@ from datetime import datetime
 
 def print_category_details(requested_category, category, saldo_start):
         (inflow, outflow) = category[requested_category].calculate_flows()
-        print(f'\nMoney gained in category: {requested_category}: {round(inflow,2)}')
-        print(f'Money lost in category: {requested_category}: {round(outflow,2)}')
+        print(f'\nIncome in category: {requested_category}: {round(inflow,2)}')
+        print(f'Expenditures in category: {requested_category}: {round(outflow,2)}')
 
         if '--transactions' in sys.argv:
             for transaction in category[requested_category].transactions:
@@ -29,33 +29,40 @@ def make_timeline_csv(requested_category, category, saldo_start):
         transaction_writer = csv.writer(csvfile, delimiter =',', quotechar = '"')
 
         # Write header
-        transaction_writer.writerow(['boekingsdatum', 'bedrag', 'saldo_voor', 'category'])
+        transaction_writer.writerow(['boekingsdatum', 'bedrag', 'net_change', 'saldo_voor', 'category', 'naam_tegenrekening', 'omschrijving'])
 
         for transaction in category[requested_category].transactions:
-            net_change += 1
+            net_change += transaction.attributes['bedrag']
             columns = [
             datetime.strftime(transaction.attributes['boekingsdatum'],'%d-%m-%Y'),
             str(transaction.attributes['bedrag']),
+            net_change,
             str(transaction.attributes['saldo_voor']),
-            transaction.category
+            transaction.category,
+            transaction.attributes['naam_tegenrekening'],
+            transaction.attributes['omschrijving']
             ]
             transaction_writer.writerow(columns)
-    print(f'\n{requested_category}_timeline.csv had been created in the outputs folder.')
+
+    print(f'\n{requested_category}_transactions.csv had been created in the outputs folder.')
 
 def check_percentage_uncategorized(category):
     '''
-    Check the percentage of money in and out that is uncategorized.
+    Checks the percentage of money in and out that is uncategorized
     '''
-    acceptable_uncategorized_percentage = 10
-    percentage_ungategorized_in = abs(category['Geen categorie'].calculate_flows()[0]/category['Totaal'].calculate_flows()[0] * 100)
-    transactions_uncategorized_in = len([transaction for transaction in category['Geen categorie'].transactions if transaction.attributes['bedrag'] > 0])
-    percentage_ungategorized_out = abs(category['Geen categorie'].calculate_flows()[1]/category['Totaal'].calculate_flows()[1] * 100)
-    transactions_uncategorized_out = len([transaction for transaction in category['Geen categorie'].transactions if transaction.attributes['bedrag'] < 0])
+    acceptable_uncategorized_percentage = 5
 
-    if percentage_ungategorized_in > acceptable_uncategorized_percentage:
-        print(f'Warning: more than {percentage_ungategorized_in}% of income has not been categorized. This entails {transactions_uncategorized_in} transactions.')
-    if percentage_ungategorized_out > acceptable_uncategorized_percentage:
-        print(f'Warning: more than {percentage_ungategorized_out}% of spending has not been categorized. This entails {transactions_uncategorized_out} transactions.')
+    if category['Totaal'].calculate_flows()[0] != 0:
+        percentage_ungategorized_in = abs(category['Geen categorie'].calculate_flows()[0]/category['Totaal'].calculate_flows()[0] * 100)
+        transactions_uncategorized_in = len([transaction for transaction in category['Geen categorie'].transactions if transaction.attributes['bedrag'] > 0])
+        if percentage_ungategorized_in > acceptable_uncategorized_percentage:
+            print(f'Warning: {round(percentage_ungategorized_in, 2)}% of income has not been categorized. This entails {transactions_uncategorized_in} transactions.')
+
+    if category['Totaal'].calculate_flows()[1] != 0:
+        percentage_ungategorized_out = abs(category['Geen categorie'].calculate_flows()[1]/category['Totaal'].calculate_flows()[1] * 100)
+        transactions_uncategorized_out = len([transaction for transaction in category['Geen categorie'].transactions if transaction.attributes['bedrag'] < 0])
+        if percentage_ungategorized_out > acceptable_uncategorized_percentage:
+            print(f'Warning: {round(percentage_ungategorized_out, 2)}% of spending has not been categorized. This entails {transactions_uncategorized_out} transactions.')
 
 def print_results(category, saldo_start):
     money_per_category = {}
@@ -67,11 +74,14 @@ def print_results(category, saldo_start):
 
     # Calculate total flows
     (total_in,total_out) = category['Totaal'].calculate_flows()
+    (savings_in, savings_out) = category['Spaar'].calculate_flows()
     balance_change = total_in + total_out
     saldo_end = saldo_start + balance_change
+    savings_balance = savings_in + savings_out
+    current_balance = saldo_end - savings_balance
 
-    text = ('Initial amount', 'Total in', 'Total out', 'Balance change','Final amount')
-    amount = (saldo_start, total_in, total_out, balance_change, saldo_end)
+    text = ('Initial amount', 'Total in', 'Total out', 'Balance change', 'On current account', 'On savings account','Final amount')
+    amount = (saldo_start, total_in, total_out, balance_change, current_balance, savings_balance, saldo_end)
 
     #Printing
     print('\n')
@@ -96,4 +106,4 @@ def print_results(category, saldo_start):
                 print_category_details(requested_category, category, saldo_start)
                 break
             except:
-                print('\nSorry, the input did not match any category. Try again.')
+                print('\nSorry, the input did not match any category. Please try again.')

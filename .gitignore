@@ -1,5 +1,6 @@
 # In and output
 *.csv
+.~lock*
 
 # Convenience
 misc
