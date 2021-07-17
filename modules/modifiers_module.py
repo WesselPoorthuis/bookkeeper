@@ -3,7 +3,7 @@ import csv
 from datetime import datetime
 
 def process_modifiers(category, saldo_start):
-    # If no category is specified, assume 'Totaal' is desired
+    # If no category is specified, assume all transactions are requested
     requested_category = 'Totaal'
 
     if '--category' in sys.argv:
@@ -16,10 +16,10 @@ def process_modifiers(category, saldo_start):
         print_category_details(requested_category, category)
 
     if '--transactions' in sys.argv:
-        print_transactions(requested_category, category, transaction)
+        print_transactions(requested_category, category)
 
     if '--csv' in sys.argv:
-        make_timeline_csv(requested_category, category, saldo_start)
+        write_transactions_csv(requested_category, category, saldo_start)
 
 def print_category_details(requested_category, category):
     '''
@@ -30,7 +30,7 @@ def print_category_details(requested_category, category):
     print(f'Expenditures in category {requested_category}: {round(outflow,2)}')
     # Visualisations here? net change over time?
 
-def print_transactions(requested_category, category, transaction):
+def print_transactions(requested_category, category):
     '''
     Prints transactions to terminal.
     '''
@@ -38,6 +38,8 @@ def print_transactions(requested_category, category, transaction):
     header = ['boekingsdatum', 'bedrag', 'category', 'naam_tegenrekening', 'omschrijving']
     print(', '.join(header))
     for transaction in category[requested_category].transactions:
+        if transaction.category == None:
+            transaction.category = 'Geen categorie'
         columns = [
         datetime.strftime(transaction.attributes['boekingsdatum'],'%d-%m-%Y'),
         str(transaction.attributes['bedrag']),
@@ -48,7 +50,7 @@ def print_transactions(requested_category, category, transaction):
         print(', '.join(columns))
         print('\n')
 
-def make_timeline_csv(requested_category, category, saldo_start):
+def write_transactions_csv(requested_category, category, saldo_start):
     '''
     Writes .csv file with transaction data.
     '''
@@ -65,7 +67,7 @@ def make_timeline_csv(requested_category, category, saldo_start):
         # Write header
         transaction_writer.writerow(['boekingsdatum', 'bedrag', 'net_change', 'saldo_voor', 'category', 'naam_tegenrekening', 'omschrijving'])
 
-        # Write transactions_uncategorized_in
+        # Write transaction data
         for transaction in category[requested_category].transactions:
             net_change += transaction.attributes['bedrag']
             columns = [

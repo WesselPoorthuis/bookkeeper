@@ -18,9 +18,7 @@ def calculate_percentage_uncategorized(category):
 
     return (percentage_ungategorized_in, transactions_uncategorized_in, percentage_ungategorized_out, transactions_uncategorized_out)
 
-def print_results(category, saldo_start):
-    money_per_category = {}
-    acceptable_uncategorized_percentage = 5
+def print_results(category, saldo_start, acceptable_uncategorized_percentage):
 
     # Calculate total flows
     (total_in,total_out) = category['Totaal'].calculate_flows()
@@ -33,13 +31,14 @@ def print_results(category, saldo_start):
     # Print overview
     total_flows_text = ('Initial amount', 'Total in', 'Total out', 'Balance change', 'On current account', 'On savings account','Final amount')
     total_flow_amounts = (saldo_start, total_in, total_out, balance_change, current_balance, savings_balance, saldo_end)
-    print('\n')
     print('Overview'.center(32,' '))
     print(''.center(32,'~'))
     for flow, amount in zip(total_flows_text, total_flow_amounts):
         print(f'{flow:20}:{amount:11.2f}')
     print(''.center(32,'~'))
+
     # Count flows per category
+    money_per_category = {}
     for cat in category:
         (inflow, outflow) = category[cat].calculate_flows()
         money_per_category[cat] = inflow + outflow

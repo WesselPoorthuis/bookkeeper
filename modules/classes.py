@@ -26,13 +26,13 @@ class Category:
                 flow_in += transaction.attributes['bedrag']
         return (flow_in,flow_out)
 
-"""
-:authors: python273
-:license: Apache License, Version 2.0
-:copyright: (c) 2018 python273
-"""
 
 class DatetimeRange:
+    """
+    :authors: python273
+    :license: Apache License, Version 2.0
+    :copyright: (c) 2018 python273
+    """
     def __init__(self, start_date, end_date):
         if end_date < start_date:
             raise ValueError('{!r} < {!r}'.format(end_date, start_date))
