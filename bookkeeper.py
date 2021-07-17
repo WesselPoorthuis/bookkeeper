@@ -7,7 +7,7 @@ import argparse
 from modules.output_module import print_results
 from modules.categorisation_module import categorize_transaction
 from modules.keywords_module import add_tegenrekening_keywords, add_omschrijving_keywords
-from classes import Transaction, Category, DatetimeRange
+from modules.classes import Transaction, Category, DatetimeRange
 
 # Required for relative imports to also work when called
 # from project root directory.
@@ -26,13 +26,17 @@ def get_dates():
             requested_date = (requested_date, requested_date)
             requested_dates.append(requested_date)
         except:
-            print(f'{requested_date} is not the right format, please try again.')
+            print('That\'s not the right format, please try again.')
     return requested_dates
 
 def get_intervals():
     requested_intervals = []
+    requested_intervals_fixed = []
+    current_start = datetime(1, 1, 1, 0, 0)
+    current_end = datetime(1, 1, 1, 0, 0)
 
-    print('Enter desired intervals in dd-mm-yyyy/dd-mm-yyyy format.\nWhen finished, type "done".\nOverlapping will double count.')
+    # Get user input of intervals
+    print('Enter desired intervals in dd-mm-yyyy/dd-mm-yyyy format.\nWhen finished, type "done".')
     while True:
         try:
             requested_interval = input()
@@ -44,8 +48,25 @@ def get_intervals():
             requested_interval = DatetimeRange(start_date, end_date)
             requested_intervals.append(requested_interval)
         except:
-            print(f'{requested_interval} is not the right format, please try again.')
-    return requested_intervals
+            print('That\'s not the right format, please try again.')
+
+    # Remove overlap to remove double counting inspired by https://codereview.stackexchange.com/a/21309
+    for interval in requested_intervals:
+        start = interval.start_date
+        end = interval.end_date
+        if start > current_end:
+            # this segment starts after the last segment stops
+            # just add a new segment
+            requested_intervals_fixed.append(interval)
+            current_start, current_end = start, end
+        else:
+            # segments overlap, replace
+            if end > current_end:
+                requested_intervals_fixed[-1] = DatetimeRange(current_start, end)
+            # current_start already guaranteed to be lower
+            current_end = max(current_end, end)
+
+    return requested_intervals_fixed
 
 def initialize_categories(category_list, category):
     # Create categories

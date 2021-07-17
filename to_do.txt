@@ -1,3 +1,2 @@
 - Visualizations
 - Subcategories?
-- Fix time interval overlaps double counting

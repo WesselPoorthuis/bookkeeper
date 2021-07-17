@@ -1,5 +1,5 @@
 from datetime import datetime
-from classes import Transaction, Category, DatetimeRange
+from modules.classes import Transaction, Category, DatetimeRange
 
 def categorize_transaction(transaction, category):
 
