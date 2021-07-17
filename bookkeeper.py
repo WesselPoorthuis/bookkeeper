@@ -7,38 +7,45 @@ import argparse
 from modules.output_module import print_results
 from modules.categorisation_module import categorize_transaction
 from modules.keywords_module import add_tegenrekening_keywords, add_omschrijving_keywords
-from classes import Transaction, Category
+from classes import Transaction, Category, DatetimeRange
 
 # Required for relative imports to also work when called
 # from project root directory.
 sys.path.append(os.path.dirname(__file__))
 
-def check_date():
-        while True:
-            try:
-                requested_date = input('Enter desired date in dd-mm-yyyy format\n')
-                requested_date = datetime.strptime(requested_date, '%d-%m-%Y')
-                return requested_date
-                break
-            except:
-                print(f'{requested_date} is not the right format, please try again\n')
+def get_dates():
+    requested_dates = []
 
-def check_dates():
-        while True:
-            try:
-                start_date = input('Enter starting date in dd-mm-yyyy format\n')
-                start_date = datetime.strptime(start_date, '%d-%m-%Y')
+    print('Enter desired dates in dd-mm-yyyy format.\nWhen finished, type "done".\n')
+    while True:
+        try:
+            requested_date = input()
+            if requested_date == 'done':
                 break
-            except:
-                print(f'{start_date} is not the right format, please try again\n')
-        while True:
-            try:
-                end_date = input('Enter final date in dd-mm-yyyy format\n')
-                end_date = datetime.strptime(end_date, '%d-%m-%Y')
-                return (start_date, end_date)
+            requested_date = datetime.strptime(requested_date, '%d-%m-%Y')
+            requested_date = (requested_date, requested_date)
+            requested_dates.append(requested_date)
+        except:
+            print(f'{requested_date} is not the right format, please try again.')
+    return requested_dates
+
+def get_intervals():
+    requested_intervals = []
+
+    print('Enter desired intervals in dd-mm-yyyy/dd-mm-yyyy format.\nWhen finished, type "done".\nOverlapping will double count.')
+    while True:
+        try:
+            requested_interval = input()
+            if requested_interval == 'done':
                 break
-            except:
-                print(f'{end_date} is not the right format, please try again\n')
+            (start_date, end_date) = (requested_interval[:10], requested_interval[-9:])
+            start_date = datetime.strptime(start_date, '%d-%m-%Y')
+            end_date = datetime.strptime(end_date, '%d-%m-%Y')
+            requested_interval = DatetimeRange(start_date, end_date)
+            requested_intervals.append(requested_interval)
+        except:
+            print(f'{requested_interval} is not the right format, please try again.')
+    return requested_intervals
 
 def initialize_categories(category_list, category):
     # Create categories
@@ -52,11 +59,11 @@ def initialize_categories(category_list, category):
 def main():
     # Create help
     parser = argparse.ArgumentParser(description='Goes through .csv file with banking details and categorizes transactions.')
-    parser.add_argument('--category', action='store_true', help='get more detailed information about a category')
-    parser.add_argument('--csv', action='store_true', help='generate .csv file with transaction history of the category specified with --category')
-    parser.add_argument('--transactions', action='store_true', help='prints every transaction in the category specified with --category')
-    parser.add_argument('--date', action='store_true', help='only considers transactions on a given date')
-    parser.add_argument('--dates', action='store_true', help='only considers transactions between two given dates (inclusive)')
+    parser.add_argument('--category', action='store_true', help='Prints more detailed information about a category.')
+    parser.add_argument('--csv', action='store_true', help='Generates .csv file with transaction history of the category specified with --category.')
+    parser.add_argument('--transactions', action='store_true', help='Prints every transaction in the category specified with --category. Useful for a quick view.')
+    parser.add_argument('--dates', action='store_true', help='Specify transactions per day.')
+    parser.add_argument('--intervals', action='store_true', help='Specify transactions per time interval (inclusive).')
     args = parser.parse_args()
 
     # Create category instances based on category list
@@ -91,24 +98,24 @@ def main():
     initialize_categories(category_list, category)
 
     #Check for date modifiers
-    requested_date = None
+    requested_dates = [DatetimeRange(datetime(1,1,1), datetime(9999,1,1))]
     start_date = None
     end_date = None
 
-    if '--date' in sys.argv:
-        requested_date = check_date()
-
     if '--dates' in sys.argv:
-        (start_date, end_date) = check_dates()
+        requested_dates = get_dates()
+
+    if '--intervals' in sys.argv:
+        requested_dates = get_intervals()
 
     # Declare variables
     transaction_number = 0
     saldo_start = 0
 
     # Read in .csv file
-    FILE_NAME_IN = 'inputs/betaal_2.csv'
+    FILE_NAME_IN = 'betaal_2.csv'
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    path_in = os.path.join(current_dir, FILE_NAME_IN)
+    path_in = os.path.join(current_dir + '/inputs', FILE_NAME_IN)
 
     with open(path_in) as infile:
         reader = csv.reader(infile, delimiter = ';')
@@ -139,12 +146,13 @@ def main():
                 'afschriftnummer': row[18]
             }
 
-            if (requested_date is None and start_date is None) or (requested_date is not None and attributes['boekingsdatum'] == requested_date) or (start_date is not None and attributes['boekingsdatum'] >= start_date and attributes['boekingsdatum'] <= end_date):
-                transaction = Transaction(attributes)
-                if transaction.attributes['transaction_number'] == 0:
-                    saldo_start = transaction.attributes['saldo_voor']
-                categorize_transaction(transaction, category)
-                transaction_number += 1
+            for interval in requested_dates:
+                if interval.__contains__(attributes['boekingsdatum']):
+                    transaction = Transaction(attributes)
+                    if transaction.attributes['transaction_number'] == 0:
+                        saldo_start = transaction.attributes['saldo_voor']
+                    categorize_transaction(transaction, category)
+                    transaction_number += 1
 
     #Print results
     print_results(category, saldo_start)

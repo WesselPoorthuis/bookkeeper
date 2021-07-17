@@ -2,9 +2,6 @@
 *.csv
 .~lock*
 
-# Convenience
-misc
-
 # Python caches
 __pycache__
 *.pyc

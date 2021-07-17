@@ -6,12 +6,6 @@ def categorize_transaction(transaction, category):
     naam_tegenrekening = transaction.attributes['naam_tegenrekening'].lower()
     omschrijving = transaction.attributes['omschrijving'].lower()
 
-    #Holidays
-    zomervakantie_2020_start = datetime.strptime('2020-07-08', '%Y-%m-%d')
-    zomervakantie_2020_end = datetime.strptime('2020-08-01', '%Y-%m-%d')
-    chillberen_keulen_2019_start = datetime.strptime('2019-12-27', '%Y-%m-%d')
-    chillberen_keulen_2019_end = datetime.strptime('2019-12-30', '%Y-%m-%d')
-
     # Categorisation based on IBAN
     # These transactions are between current account and savings account
     if transaction.attributes['tegenrekening'] == 'NL63ASNB8820283166':
@@ -24,10 +18,10 @@ def categorize_transaction(transaction, category):
         category['Totaal'].transactions.append(transaction)
 
     # Holiday dates
-    zomervakantie_2020_start = datetime.strptime('2020-07-08', '%Y-%m-%d')
-    zomervakantie_2020_end = datetime.strptime('2020-08-01', '%Y-%m-%d')
-    chillberen_keulen_2019_start = datetime.strptime('2019-12-27', '%Y-%m-%d')
-    chillberen_keulen_2019_end = datetime.strptime('2019-12-30', '%Y-%m-%d')
+    zomervakantie_2020_start = datetime(2020,7,8)
+    zomervakantie_2020_end = datetime(2020,8,1)
+    chillberen_keulen_2019_start = datetime(2019,12,27)
+    chillberen_keulen_2019_end = datetime(2019,12,30)
 
     # Categorisation based on date
     if transaction.category is None:
@@ -42,11 +36,11 @@ def categorize_transaction(transaction, category):
     # Categorisation based on keywords
     if transaction.category is None:
         for cat in category:
-            if any(x.lower() in naam_tegenrekening for x in category[cat].keywords_naam_tegenrekening):
+            if any(substring.lower() in naam_tegenrekening for substring in category[cat].keywords_naam_tegenrekening):
                 category[cat].transactions.append(transaction)
                 transaction.category = cat
                 break
-            if any(x.lower() in omschrijving for x in category[cat].keywords_omschrijving):
+            if any(substring.lower() in omschrijving for substring in category[cat].keywords_omschrijving):
                 category[cat].transactions.append(transaction)
                 transaction.category = cat
                 break
