@@ -1,5 +1,5 @@
 from datetime import datetime
-from classes import Transaction, Category
+from classes import Transaction, Category, DatetimeRange
 
 def categorize_transaction(transaction, category):
 
@@ -18,18 +18,12 @@ def categorize_transaction(transaction, category):
         category['Totaal'].transactions.append(transaction)
 
     # Holiday dates
-    zomervakantie_2020_start = datetime(2020,7,8)
-    zomervakantie_2020_end = datetime(2020,8,1)
-    chillberen_keulen_2019_start = datetime(2019,12,27)
-    chillberen_keulen_2019_end = datetime(2019,12,30)
+    zomervakantie_2020 = DatetimeRange(datetime(2020,7,8), datetime(2020,8,1))
+    chillberen_keulen_2019 = DatetimeRange(datetime(2019,12,27), datetime(2019,12,30))
 
     # Categorisation based on date
     if transaction.category is None:
-        if transaction.attributes['boekingsdatum'] >= zomervakantie_2020_start and transaction.attributes['boekingsdatum'] <= zomervakantie_2020_end:
-            category['Vakanties'].transactions.append(transaction)
-            transaction.category = 'Vakanties'
-    if transaction.category is None:
-        if transaction.attributes['boekingsdatum'] >= chillberen_keulen_2019_start and transaction.attributes['boekingsdatum'] <= chillberen_keulen_2019_end:
+        if zomervakantie_2020.__contains__(transaction.attributes['boekingsdatum']) or chillberen_keulen_2019.__contains__(transaction.attributes['boekingsdatum']):
             category['Vakanties'].transactions.append(transaction)
             transaction.category = 'Vakanties'
 
